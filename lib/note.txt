@@ -1,0 +1,12 @@
+// to channge the app icon
+// mdpi (48x48 px): Place the 48x48 icon in the mipmap-mdpi/ folder.
+
+// hdpi (72x72 px): Place the 72x72 icon in the mipmap-hdpi/ folder.
+
+// xhdpi (96x96 px): Place the 96x96 icon in the mipmap-xhdpi/ folder.
+
+// xxhdpi (144x144 px): Place the 144x144 icon in the mipmap-xxhdpi/ folder.
+
+// xxxhdpi (192x192 px): Place the 192x192 icon in the mipmap-xxxhdpi/ folder
+
+------------------------------------------------------------------------------------------------------
