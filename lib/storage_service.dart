@@ -1,12 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
 import 'data_usage.dart';
 
 class DataUsageStorageService {
-  static late Box<DataUsageModel> _dataUsageBox;
+  // Private static instance for Singleton pattern
+  static final DataUsageStorageService _instance = DataUsageStorageService._internal();
 
-  static Future<void> init() async {
+  // Private constructor
+  DataUsageStorageService._internal();
+
+  // Static method to access the instance
+  static DataUsageStorageService get instance => _instance;
+
+  late Box<DataUsageModel> _dataUsageBox;
+
+  // Initialization method for the singleton instance
+  Future<void> init() async {
     await Hive.initFlutter();
 
     if (!Hive.isAdapterRegistered(0)) {
@@ -14,15 +23,18 @@ class DataUsageStorageService {
     }
 
     _dataUsageBox = await Hive.openBox<DataUsageModel>('dataUsageBox');
+    print("completely init................................");
   }
 
-  static ValueListenable<Box<DataUsageModel>> get listenableBox => _dataUsageBox.listenable();
+  ValueListenable<Box<DataUsageModel>> get listenableBox => _dataUsageBox.listenable();
 
-  static List<DataUsageModel> getDataUsageList() {
+  List<DataUsageModel> getDataUsageList() {
     return _dataUsageBox.values.toList();
   }
 
-  static Future<void> writeFunction(DateTime date, bool isWifi, int kbps) async {
+  Future<void> writeFunction(DateTime date, bool isWifi, int kbps) async {
+    print("writing................................");
+    print(_dataUsageBox.isOpen);
     final index = _dataUsageBox.values.toList().indexWhere((data) => isSameDay(data.date, date));
 
     if (index != -1) {
@@ -44,9 +56,10 @@ class DataUsageStorageService {
       );
       await _dataUsageBox.add(newData);
     }
+    
   }
 
-  static bool isSameDay(DateTime d1, DateTime d2) {
+  bool isSameDay(DateTime d1, DateTime d2) {
     return d1.year == d2.year && d1.month == d2.month && d1.day == d2.day;
   }
 }
