@@ -23,7 +23,6 @@ class DataUsageStorageService {
     }
 
     _dataUsageBox = await Hive.openBox<DataUsageModel>('dataUsageBox');
-    print("completely init................................");
   }
 
   ValueListenable<Box<DataUsageModel>> get listenableBox => _dataUsageBox.listenable();
@@ -33,8 +32,6 @@ class DataUsageStorageService {
   }
 
   Future<void> writeFunction(DateTime date, bool isWifi, int kbps) async {
-    print("writing................................");
-    print(_dataUsageBox.isOpen);
     final index = _dataUsageBox.values.toList().indexWhere((data) => isSameDay(data.date, date));
 
     if (index != -1) {

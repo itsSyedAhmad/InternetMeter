@@ -13,9 +13,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await DataUsageStorageService.instance.init();
-  print("am i here already");
-  //await Future.delayed(Duration(seconds: 5));
-  await startForegroundService();
+ 
+  await SpeedMonitorService().startForegroundService();
 
 
 

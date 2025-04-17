@@ -1,12 +1,13 @@
-import 'dart:async';
+
 
 
 import 'package:flutter/material.dart';
 import 'package:flutter_internet_meter/data_usage.dart';
 import 'package:flutter_internet_meter/storage_service.dart';
+import 'package:flutter_internet_meter/text_service.dart';
 import 'package:hive/hive.dart';
 
-class UsageDataScreen extends StatefulWidget {
+class UsageDataScreen extends StatelessWidget {
   const UsageDataScreen({super.key});
 
   static String _month(int month) {
@@ -15,42 +16,8 @@ class UsageDataScreen extends StatefulWidget {
   }
 
   @override
-  State<UsageDataScreen> createState() => _UsageDataScreenState();
-}
-
-
-class _UsageDataScreenState extends State<UsageDataScreen> {
-  bool wait=true;
-  late Timer timer;
-
-  @override
-  void initState() {
-    
-    super.initState();
-    // timer=Timer.periodic(Duration(seconds: 2), (_){
-    //   print("timer");
-    //     setState(() {
-          
-    //     });
-
-    // });
-    Future.delayed(Duration(seconds: 3)).then((_){
-      setState(() {
-        wait=false;
-        
-      });
-      
-
-    });
-  }
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    //timer.cancel();
-  }
-  @override
   Widget build(BuildContext context) {
-    return wait?CircularProgressIndicator() :Scaffold(
+    return Scaffold(
       
       body: Container(
         decoration: BoxDecoration(
@@ -68,7 +35,7 @@ class _UsageDataScreenState extends State<UsageDataScreen> {
               child: ValueListenableBuilder(
                 valueListenable: DataUsageStorageService.instance.listenableBox,
                 builder: (context, Box<DataUsageModel> box, _) {
-                  print("building.....");
+                 
                   final List<Map<String, String>> usage = List.generate(30, (index) {
                     final date = DateTime.now().subtract(Duration(days: index));
                     int mobile = 0;
@@ -87,10 +54,10 @@ class _UsageDataScreenState extends State<UsageDataScreen> {
                     return {
                       'date': index == 0
                           ? 'Today'
-                          : '${date.day.toString().padLeft(2, '0')}-${UsageDataScreen._month(date.month)}-${date.year}',
-                      'mobile': '$mobile KB',
-                      'wifi': '$wifi KB',
-                      'total': '$total KB',
+                          : '${date.day.toString().padLeft(2, '0')}-${_month(date.month)}-${date.year}',
+                      'mobile': TextService().formatSpeed(mobile)    ,
+                      'wifi': TextService().formatSpeed(wifi)    ,
+                      'total': TextService().formatSpeed(total)    ,
                     };
                   });
 
@@ -180,7 +147,7 @@ class _UsageDataScreenState extends State<UsageDataScreen> {
 }
 
 
-  Widget _animatedCell(String text) {
+Widget _animatedCell(String text) {
     return Expanded(
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 500),
