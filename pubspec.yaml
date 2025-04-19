@@ -41,7 +41,13 @@ dependencies:
   path_provider: ^2.1.5
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  flutter_foreground_task: ^6.1.2
+  
+  
+  flutter_foreground_task:
+    git:
+      url: https://github.com/itsSyedAhmad/flutter_foreground_task2.git
+      ref: master
+  
 
 dev_dependencies:
   flutter_test:

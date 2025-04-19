@@ -55,7 +55,14 @@ class DataUsageStorageService {
     }
     
   }
+DataUsageModel getTodayUsage() {
+  final today = DateTime.now();
 
+  return _dataUsageBox.values.firstWhere(
+    (data) => isSameDay(data.date, today),
+    orElse: () => DataUsageModel(date: today, mobile: 0, wifi: 0),
+  );
+}
   bool isSameDay(DateTime d1, DateTime d2) {
     return d1.year == d2.year && d1.month == d2.month && d1.day == d2.day;
   }
