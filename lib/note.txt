@@ -9,4 +9,14 @@
 
 // xxxhdpi (192x192 px): Place the 192x192 icon in the mipmap-xxxhdpi/ folder
 
+
+
+//notification builder
+The condition Build.VERSION.SDK_INT >= Build.VERSION_CODES.O is used to check the Android version of the device running your application. Here's a breakdown:
+
+Build.VERSION.SDK_INT: This retrieves the SDK version number of the device (the version of Android it is running).
+
+Build.VERSION_CODES.O: This corresponds to the constant for Android 8.0 (Oreo), which is API level 26.
+
+So, Build.VERSION.SDK_INT >= Build.VERSION_CODES.O checks if the device is running Android 8.0 Oreo (API level 26) or higher.
 ------------------------------------------------------------------------------------------------------
