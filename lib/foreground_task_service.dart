@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'dart:math';
 
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_internet_meter/storage_service.dart';
@@ -17,6 +16,8 @@ class SpeedMonitorService {
 
   Future<void> startForegroundService() async {
     _initializeForegroundTask();
+   
+
 
     // Start the foreground service with notification and callback
     await FlutterForegroundTask.startService(
@@ -26,12 +27,14 @@ class SpeedMonitorService {
     );
     FlutterForegroundTask.initCommunicationPort();
 
-    FlutterForegroundTask.addTaskDataCallback((data){
+    FlutterForegroundTask.addTaskDataCallback((data ){
+      
+      var resMap=data as Map<Object?,Object?>;
      
         DataUsageStorageService.instance.writeFunction(
           DateTime.now(),
-          false,
-          (data as double).round(),
+          resMap["isWiFi"] as bool,
+          (resMap["kbps"] as double).round(),
         );
       });
     }
@@ -71,6 +74,7 @@ void startCallback() {
 class NetworkSpeedTaskHandler extends TaskHandler {
   
   static  double currentKbps = 0;
+  int i=0;
 
   @override
   Future<void> onStart(DateTime timestamp,TaskStarter t) async {
@@ -86,41 +90,58 @@ class NetworkSpeedTaskHandler extends TaskHandler {
   Future<void> _checkSpeedAndNotify() async {
     
     double kbps = 0;
+    bool isWiFi=false;
   
 
-    // Simulate random speed for now (replace with actual logic later)
-    double lowerBound = 1000.0;
-    double upperBound = 1050;
-    final random = Random();
-    kbps = lowerBound + random.nextDouble() * (upperBound - lowerBound);
+    
 
-   // bool isWifi = false;
+    
+
+
+
+
+
+    var resMap= await FlutterForegroundTask.getSpeed();
+    if(i!=0){
+      kbps=resMap["kbps"]as double;
+    isWiFi=resMap["isWiFi"] as bool;
+
+    }
+    i++;
+    
+    
+    
+    
     final todayUsageBlock=DataUsageStorageService.instance.getTodayUsage();
     final todayWifiUsage=todayUsageBlock.wifi;
     final todayMobileUsage=todayUsageBlock.mobile;
     final curSpeedText= TextService().formatSpeed(kbps.round());
     final String mobileText = TextService().formatSpeed(todayMobileUsage.round());
     final String wifiText = TextService().formatSpeed(todayWifiUsage.round());
+   
 
 
     // Update the service's notification with current speed values
     await FlutterForegroundTask.updateService(
       notificationTitle: 'Speed Monitor Running',
       notificationText: 'Mobile: $mobileText  Wifi: $wifiText ',
-      smalliconText: curSpeedText
+      smalliconText: "$curSpeedText/s"
     
       );
       
-      DataUsageStorageService.instance.writeFunction(
+         DataUsageStorageService.instance.writeFunction(
           DateTime.now(),
-          false,
+          isWiFi,
           (kbps).round(),
         );
+
+      
+     
       
      
     
  // Send speed data back to the main isolate
-   FlutterForegroundTask.sendDataToMain(kbps);
+   FlutterForegroundTask.sendDataToMain({"kbps":kbps,"isWiFi":isWiFi});
    
     
   }

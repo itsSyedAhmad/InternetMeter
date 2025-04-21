@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_internet_meter/foreground_task_service.dart';
@@ -18,9 +20,13 @@ void main() async {
     await FlutterForegroundTask.requestNotificationPermission();
   }
 
-  //init services
+  // //init services
   await DataUsageStorageService.instance.init();
   await SpeedMonitorService().startForegroundService();
 
   runApp(MaterialApp(home: UsageDataScreen()));
 }
+// //
+
+//void main() => runApp(MaterialApp(home: MyPathCarDemo()));
+

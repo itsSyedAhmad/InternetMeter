@@ -7,12 +7,24 @@ import android.graphics.*
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
 import io.flutter.embedding.android.FlutterActivity
-import io.flutter.embedding.engine.FlutterEngine
+
 import io.flutter.plugin.common.MethodChannel
  import android.graphics.Typeface
 
+ import android.net.TrafficStats
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+
+import io.flutter.embedding.engine.FlutterEngine
+
+
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.example.flutter_internet_meter/speed_icon"
+    private var previousRxBytes: Long = 0
+    private var previousTxBytes: Long = 0
+    private var previousTime: Long = 0
+
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -23,7 +35,35 @@ class MainActivity : FlutterActivity() {
                 val speed = call.argument<String>("speed") ?: "0 KB/s"
                 updateNotificationIcon(speed)
                 result.success(null)
-            } else {
+            } 
+            if (call.method == "getTotalBandwidthKbps") {
+                val currentTime = System.currentTimeMillis()
+                val rxBytes = TrafficStats.getTotalRxBytes()
+                val txBytes = TrafficStats.getTotalTxBytes()
+
+                if (previousTime == 0L) {
+                    previousTime = currentTime
+                    previousRxBytes = rxBytes
+                    previousTxBytes = txBytes
+                    result.success(0.0)
+                    return@setMethodCallHandler
+                }
+
+                val timeDiff = (currentTime - previousTime) / 1000.0 // seconds
+                val dataDiff = (rxBytes - previousRxBytes) + (txBytes - previousTxBytes) // bytes
+
+                val kbps = if (timeDiff > 0) (dataDiff * 8.0 / 1024.0) / timeDiff else 0.0
+
+                // Update previous values
+                previousRxBytes = rxBytes
+                previousTxBytes = txBytes
+                previousTime = currentTime
+
+                result.success(kbps) // in Kbps
+            } 
+            
+            
+            else {
                 result.notImplemented()
             }
         }
