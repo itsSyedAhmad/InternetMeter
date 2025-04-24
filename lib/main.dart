@@ -21,8 +21,9 @@ void main() async {
   }
 
   // //init services
-  await DataUsageStorageService.instance.init();
+  await DataUsageStorageService.instance.initMainBox();
   await SpeedMonitorService().startForegroundService();
+    FlutterForegroundTask.initCommunicationPort();
 
   runApp(MaterialApp(home: UsageDataScreen()));
 }

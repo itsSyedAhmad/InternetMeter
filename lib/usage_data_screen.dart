@@ -2,12 +2,13 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_internet_meter/data_usage.dart';
 import 'package:flutter_internet_meter/storage_service.dart';
 import 'package:flutter_internet_meter/text_service.dart';
 import 'package:hive/hive.dart';
 
-class UsageDataScreen extends StatelessWidget {
+class UsageDataScreen extends StatefulWidget {
   const UsageDataScreen({super.key});
 
   static String _month(int month) {
@@ -15,6 +16,16 @@ class UsageDataScreen extends StatelessWidget {
     return months[month - 1];
   }
 
+  @override
+  State<UsageDataScreen> createState() => _UsageDataScreenState();
+}
+
+class _UsageDataScreenState extends State<UsageDataScreen> {
+  @override
+  void initState() {
+     FlutterForegroundTask.initCommunicationPort(); // Re
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,6 +47,7 @@ class UsageDataScreen extends StatelessWidget {
                 valueListenable: DataUsageStorageService.instance.listenableBox,
                 builder: (context, Box<DataUsageModel> box, _) {
                  
+                 
                   final List<Map<String, String>> usage = List.generate(30, (index) {
                     final date = DateTime.now().subtract(Duration(days: index));
                     int mobile = 0;
@@ -44,9 +56,12 @@ class UsageDataScreen extends StatelessWidget {
 
                     for (var b in box.values) {
                       if (isSameDay(date, b.date)) {
+                      
                         mobile = b.mobile;
                         wifi = b.wifi;
                         total = mobile + wifi;
+                        //  print("same da $date $wifi $mobile");;
+
                         break;
                       }
                     }
@@ -54,7 +69,7 @@ class UsageDataScreen extends StatelessWidget {
                     return {
                       'date': index == 0
                           ? 'Today'
-                          : '${date.day.toString().padLeft(2, '0')}-${_month(date.month)}-${date.year}',
+                          : '${date.day.toString().padLeft(2, '0')}-${UsageDataScreen._month(date.month)}-${date.year}',
                       'mobile': TextService().formatSpeed(mobile)    ,
                       'wifi': TextService().formatSpeed(wifi)    ,
                       'total': TextService().formatSpeed(total)    ,

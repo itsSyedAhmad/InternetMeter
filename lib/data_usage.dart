@@ -18,6 +18,18 @@ class DataUsageModel {
     this.mobile = 0,
     this.wifi = 0,
   });
+  Map<String, dynamic> toMap() => {
+    'date': date.toIso8601String(),
+    'mobile': mobile,
+    'wifi': wifi,
+  };
+  factory DataUsageModel.fromMap(Map<String, dynamic> map) {
+    return DataUsageModel(
+      date: DateTime.parse(map['date']),
+      mobile: map['mobile'],
+      wifi: map['wifi'],
+    );
+  }
 }
 
 
