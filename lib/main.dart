@@ -1,10 +1,11 @@
-
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_internet_meter/foreground_task_service.dart';
 import 'package:flutter_internet_meter/storage_service.dart';
 import 'package:flutter_internet_meter/usage_data_screen.dart';
+
+import 'theme/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,12 +22,25 @@ void main() async {
   }
 
   // //init services
-  await DataUsageStorageService.instance.init();
+  await StorageService.instance.init();
   await SpeedMonitorService().startForegroundService();
 
-  runApp(MaterialApp(home: UsageDataScreen()));
+  runApp(
+    MultiBlocProvider(
+      providers: [BlocProvider(create: (context) => ThemeCubit())],
+      child: BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context, themeState) {
+          return MaterialApp(
+            home: UsageDataScreen(),
+            theme: appLightTheme(),
+            darkTheme: appDarkTheme(),
+            themeMode: themeState.themeMode,
+          );
+        }
+      ),
+    ),
+  );
 }
 // //
 
 //void main() => runApp(MaterialApp(home: MyPathCarDemo()));
-

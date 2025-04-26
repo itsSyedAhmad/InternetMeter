@@ -31,7 +31,7 @@ class SpeedMonitorService {
       
       var resMap=data as Map<Object?,Object?>;
      
-        DataUsageStorageService.instance.writeFunction(
+        StorageService.instance.writeFunction(
           DateTime.now(),
           resMap["isWiFi"] as bool,
           (resMap["kbps"] as double).round(),
@@ -78,7 +78,7 @@ class NetworkSpeedTaskHandler extends TaskHandler {
 
   @override
   Future<void> onStart(DateTime timestamp,TaskStarter t) async {
-    DataUsageStorageService.instance.init();
+    StorageService.instance.init();
     // Initialization code if needed (like getting initial byte count)
   }
 
@@ -112,7 +112,7 @@ class NetworkSpeedTaskHandler extends TaskHandler {
     
     
     
-    final todayUsageBlock=DataUsageStorageService.instance.getTodayUsage();
+    final todayUsageBlock=StorageService.instance.getTodayUsage();
     final todayWifiUsage=todayUsageBlock.wifi;
     final todayMobileUsage=todayUsageBlock.mobile;
     final curSpeedText= TextService().formatSpeed(kbps.round());
@@ -129,7 +129,7 @@ class NetworkSpeedTaskHandler extends TaskHandler {
     
       );
       
-         DataUsageStorageService.instance.writeFunction(
+         StorageService.instance.writeFunction(
           DateTime.now(),
           isWiFi,
           (kbps).round(),
