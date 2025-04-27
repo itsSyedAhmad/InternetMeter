@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_internet_meter/data_usage.dart';
 import 'package:flutter_internet_meter/storage_service.dart';
 import 'package:flutter_internet_meter/text_service.dart';
@@ -7,25 +8,23 @@ import 'package:hive/hive.dart';
 
 import 'prefernces/preferences.dart';
 
-class UsageDataScreen extends StatelessWidget {
+class UsageDataScreen extends StatefulWidget {
   const UsageDataScreen({super.key});
 
   static String _month(int month) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return months[month - 1];
+  }
+
+  @override
+  State<UsageDataScreen> createState() => _UsageDataScreenState();
+}
+
+class _UsageDataScreenState extends State<UsageDataScreen> {
+  @override
+  void initState() {
+     FlutterForegroundTask.initCommunicationPort(); // Re
+    super.initState();
   }
 
   @override
@@ -72,7 +71,7 @@ class UsageDataScreen extends StatelessWidget {
                       'date':
                           index == 0
                               ? 'Today'
-                              : '${date.day.toString().padLeft(2, '0')}-${_month(date.month)}-${date.year}',
+                              : '${date.day.toString().padLeft(2, '0')}-${UsageDataScreen._month(date.month)}-${date.year}',
                       'mobile': TextService().formatSpeed(mobile),
                       'wifi': TextService().formatSpeed(wifi),
                       'total': TextService().formatSpeed(total),
