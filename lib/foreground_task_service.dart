@@ -76,6 +76,8 @@ class NetworkSpeedTaskHandler extends TaskHandler {
   static double currentKbps = 0;
   int i = 0;
   bool hasInit=false;
+   //temporary bool value
+  bool isShowUpAndDownSpeed = false;
 
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter t) async {
@@ -92,11 +94,15 @@ class NetworkSpeedTaskHandler extends TaskHandler {
   Future<void> _checkSpeedAndNotify() async {
      if(hasInit){
     double kbps = 0;
+    double rxKBps = 0;
+    double txKBps = 0;
     bool isWiFi = false;
 
     var resMap = await FlutterForegroundTask.getSpeed();
     if (i != 0) {
       kbps = resMap["kbps"] as double;
+      rxKBps = resMap["rxKBps"] as double;
+      txKBps = resMap["txKBps"] as double;
       isWiFi = resMap["isWiFi"] as bool;
     }
     i++;
@@ -105,15 +111,20 @@ class NetworkSpeedTaskHandler extends TaskHandler {
     final todayWifiUsage = todayUsageBlock.wifi;
     final todayMobileUsage = todayUsageBlock.mobile;
     final curSpeedText = TextService().formatSpeed(kbps.round());
+    final curRxSpeedText = TextService().formatSpeed(rxKBps.round());
+    final curTxSpeedText = TextService().formatSpeed(txKBps.round());
     final String mobileText = TextService().formatSpeed(
       todayMobileUsage.round(),
     );
     final String wifiText = TextService().formatSpeed(todayWifiUsage.round());
-
+//  isShowUpAndDownSpeed = true;
     // Update the service's notification with current speed values
     await FlutterForegroundTask.updateService(
-      notificationTitle: 'Speed Monitor Running',
-      notificationText: 'current speed: 300kb/s \n\nMobile: $mobileText  Wifi: $wifiText ',
+      notificationTitle:
+          isShowUpAndDownSpeed
+              ? 'Down: $curRxSpeedText/s Up: $curTxSpeedText/s'
+              : 'Speed Monitor Running',
+       notificationText: 'current speed: 300kb/s \n\nMobile: $mobileText  Wifi: $wifiText ',
       smalliconText: "$curSpeedText/s",
     );
     try{
