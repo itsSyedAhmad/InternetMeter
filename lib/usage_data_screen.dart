@@ -29,6 +29,7 @@ class _UsageDataScreenState extends State<UsageDataScreen> {
 
   @override
   Widget build(BuildContext context) {
+   
     CustomTheme theme = Theme.of(context).extension<CustomTheme>()!;
     return Scaffold(
       body: Container(
@@ -72,9 +73,9 @@ class _UsageDataScreenState extends State<UsageDataScreen> {
                           index == 0
                               ? 'Today'
                               : '${date.day.toString().padLeft(2, '0')}-${UsageDataScreen._month(date.month)}-${date.year}',
-                      'mobile': TextService().formatSpeed(mobile),
-                      'wifi': TextService().formatSpeed(wifi),
-                      'total': TextService().formatSpeed(total),
+                      'mobile': TextService().formatSpeed(mobile,false),
+                      'wifi': TextService().formatSpeed(wifi,false),
+                      'total': TextService().formatSpeed(total,false),
                     };
                   });
 

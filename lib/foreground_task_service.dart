@@ -5,6 +5,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_internet_meter/data_usage.dart';
 import 'package:flutter_internet_meter/storage_service.dart';
 import 'package:flutter_internet_meter/text_service.dart';
+import 'package:flutter_internet_meter/theme/state/app_setting_state.dart';
 
 class SpeedMonitorService {
   static final SpeedMonitorService _instance = SpeedMonitorService._internal();
@@ -27,23 +28,16 @@ class SpeedMonitorService {
     FlutterForegroundTask.initCommunicationPort();
 
     FlutterForegroundTask.addTaskDataCallback((data) {
-   // ignore: unused_local_variable
-   var resMap = data as Map<Object?, Object?>;
-    
-     
-       List<DataUsageModel> usageList = (data["values"] as List)
-      .map((e) => DataUsageModel.fromMap(e as Map<String, dynamic>))
-      .toList();
-      
-       DataUsageStorageService.instance.writeToMainBox(
-         usageList
-        );
-      
-     
-      
+      // ignore: unused_local_variable
+      var resultMap = data as Map<Object?, Object?>;
 
-      
-   });
+      List<DataUsageModel> usageList =
+          (data["values"] as List)
+              .map((e) => DataUsageModel.fromMap(e as Map<String, dynamic>))
+              .toList();
+
+      DataUsageStorageService.instance.writeToMainBox(usageList);
+    });
   }
 }
 
@@ -73,16 +67,22 @@ void startCallback() {
 }
 
 class NetworkSpeedTaskHandler extends TaskHandler {
-  static double currentKbps = 0;
+  //static double currentKbps = 0;
   int i = 0;
-  bool hasInit=false;
-   //temporary bool value
-  bool isShowUpAndDownSpeed = false;
+  bool hasInitialized = false;
+  bool isWiFi = false;
+  double totalSpeed = 0;
+  double downloadSpeedInKbps = 0;
+  double uploadSpeedInKbps = 0;
+  //temporary bool value
+  NotificationPreference notificationPreference = NotificationPreference.always;
+  SpeedIndicatorType speedIndicatorType = SpeedIndicatorType.onlyDownloadSpeed;
+  SpeedUnit speedUnit = SpeedUnit.bytes;
 
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter t) async {
     await DataUsageStorageService.instance.initIsolateBox();
-    hasInit=true;
+    hasInitialized = true;
     // Initialization code if needed (like getting initial byte count)
   }
 
@@ -91,72 +91,105 @@ class NetworkSpeedTaskHandler extends TaskHandler {
     _checkSpeedAndNotify();
   }
 
+  @override
+  void onReceiveData(Object data) {
+    // ignore: unused_local_variable
+    var resultMap = data as Map<Object?, Object?>;
+    if (data["notificationPreference"] != null) {
+      notificationPreference = NotificationPreferenceExtension.fromString(
+        data["notificationPreference"] as String,
+      );
+    } else if (data["speedIndicatorType"] != null) {
+      speedIndicatorType = SpeedIndicatorTypeExtension.fromString(
+        data["speedIndicatorType"] as String,
+      );
+    } else if (data["speedUnit"] != null) {
+      speedUnit = SpeedUnitExtension.fromString(data["speedUnit"] as String);
+    }
+  }
+
   Future<void> _checkSpeedAndNotify() async {
-     if(hasInit){
-    double kbps = 0;
-    double rxKBps = 0;
-    double txKBps = 0;
-    bool isWiFi = false;
+    if (hasInitialized) {
+      //these values will always be in Bytes and use to calculate data usage.
 
-    var resMap = await FlutterForegroundTask.getSpeed();
-    if (i != 0) {
-      kbps = resMap["kbps"] as double;
-      rxKBps = resMap["rxKBps"] as double;
-      txKBps = resMap["txKBps"] as double;
-      isWiFi = resMap["isWiFi"] as bool;
-    }
-    i++;
+      bool shouldShowDownloadSpeedOnly =
+          speedIndicatorType == SpeedIndicatorType.onlyDownloadSpeed;
 
-    final todayUsageBlock = DataUsageStorageService.instance.getTodayUsageFromIsolateBox();
-    final todayWifiUsage = todayUsageBlock.wifi;
-    final todayMobileUsage = todayUsageBlock.mobile;
-    final curSpeedText = TextService().formatSpeed(kbps.round());
-    final curRxSpeedText = TextService().formatSpeed(rxKBps.round());
-    final curTxSpeedText = TextService().formatSpeed(txKBps.round());
-    final String mobileText = TextService().formatSpeed(
-      todayMobileUsage.round(),
-    );
-    final String wifiText = TextService().formatSpeed(todayWifiUsage.round());
-//  isShowUpAndDownSpeed = true;
-    // Update the service's notification with current speed values
-    await FlutterForegroundTask.updateService(
-      notificationTitle:
-          isShowUpAndDownSpeed
-              ? 'Down: $curRxSpeedText/s Up: $curTxSpeedText/s'
-              : 'Speed Monitor Running',
-       notificationText: 'current speed: 300kb/s \n\nMobile: $mobileText  Wifi: $wifiText ',
-      smalliconText: "$curSpeedText/s",
-    );
-    try{
-     
+      var resultMap = await FlutterForegroundTask.getSpeed();
+
+      if (i != 0) {
+        totalSpeed = resultMap["kbps"] as double;
+        downloadSpeedInKbps = resultMap["rxKBps"] as double;
+        uploadSpeedInKbps = resultMap["txKBps"] as double;
+        isWiFi = resultMap["isWiFi"] as bool;
+      }
+      i++;
+
+      final todayUsageBlock =
+          DataUsageStorageService.instance.getTodayUsageFromIsolateBox();
+      final todayWifiUsage = todayUsageBlock.wifi;
+      final todayMobileUsage = todayUsageBlock.mobile;
+      //Ui
+      final curSpeedText = TextService().formatSpeed(
+        shouldShowDownloadSpeedOnly
+            ? (downloadSpeedInKbps.round())
+            : (totalSpeed.round()),
+        speedUnit == SpeedUnit.bites,
+      );
+      final curRxSpeedText = TextService().formatSpeed(
+        downloadSpeedInKbps.round(),
+        speedUnit == SpeedUnit.bites,
+        test: true,
+      );
+      final curTxSpeedText = TextService().formatSpeed(
+        uploadSpeedInKbps.round(),
+        speedUnit == SpeedUnit.bites,
+      );
+      //
+      final String mobileText = TextService().formatSpeed(
+        todayMobileUsage.round(),
+        false,
+      );
+      final String wifiText = TextService().formatSpeed(
+        todayWifiUsage.round(),
+        false,
+      );
+      //  isShowUpAndDownSpeed = true;
+      // Update the service's notification with current speed values
+      await FlutterForegroundTask.updateService(
+        notificationTitle:
+            shouldShowDownloadSpeedOnly
+                ? " Down: $curRxSpeedText/s"
+                : 'Down: $curRxSpeedText/s Up: $curTxSpeedText/s',
+        notificationText: 'Mobile: $mobileText  Wifi: $wifiText ',
+        smalliconText: "$curSpeedText/s",
+      );
+      try {
         DataUsageStorageService.instance.writeToIsolateBox(
-      DateTime.now(),
-      isWiFi,
-      (kbps).round(),
-    );
+          DateTime.now(),
+          isWiFi,
+          shouldShowDownloadSpeedOnly
+              ? (downloadSpeedInKbps).round()
+              : totalSpeed.round(),
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+      }
 
-      
-      
+      List<DataUsageModel> values =
+          DataUsageStorageService.instance.isolateBox.values.toList();
+      List<Map<String, dynamic>> serializedValues =
+          values.map((e) {
+            return {
+              "date": e.date.toIso8601String(),
+              "mobile": e.mobile,
+              "wifi": e.wifi,
+            };
+          }).toList();
 
+      // Send speed data back to the main isolate
+      FlutterForegroundTask.sendDataToMain({"values": serializedValues});
     }
-    catch(e){
-      debugPrint(e.toString());
-
-    }
-     
-List<DataUsageModel> values=DataUsageStorageService.instance.isolateBox.values.toList();
-List<Map<String, dynamic>> serializedValues = values.map((e) {
-  return {
-  
-  "date": e.date.toIso8601String(),
-  "mobile": e.mobile,
-  "wifi": e.wifi,
-};
-}).toList();
-    
-    // Send speed data back to the main isolate
-    FlutterForegroundTask.sendDataToMain({"kbps": kbps, "isWiFi": isWiFi,"values": serializedValues,});
-     }
   }
 
   @override
