@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-import 'package:flutter_internet_meter/foreground_task_service.dart';
+
 import 'package:flutter_internet_meter/storage_service.dart';
 import 'package:flutter_internet_meter/usage_data_screen.dart';
 
@@ -23,8 +23,6 @@ void main() async {
 
   // //init services
   await DataUsageStorageService.instance.initMainBox();
-  await SpeedMonitorService().startForegroundService();
-    FlutterForegroundTask.initCommunicationPort();
 
   runApp(
     MultiBlocProvider(
@@ -37,7 +35,7 @@ void main() async {
             darkTheme: appDarkTheme(),
             themeMode: themeState.themeMode,
           );
-        }
+        },
       ),
     ),
   );

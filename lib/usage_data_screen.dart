@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_internet_meter/data_usage.dart';
+import 'package:flutter_internet_meter/foreground_task_service.dart';
 import 'package:flutter_internet_meter/storage_service.dart';
 import 'package:flutter_internet_meter/text_service.dart';
 import 'package:flutter_internet_meter/theme/theme.dart';
@@ -12,7 +13,20 @@ class UsageDataScreen extends StatefulWidget {
   const UsageDataScreen({super.key});
 
   static String _month(int month) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return months[month - 1];
   }
 
@@ -23,13 +37,17 @@ class UsageDataScreen extends StatefulWidget {
 class _UsageDataScreenState extends State<UsageDataScreen> {
   @override
   void initState() {
-     FlutterForegroundTask.initCommunicationPort(); // Re
     super.initState();
+    initService();
+  }
+
+  Future<void> initService() async {
+    await SpeedMonitorService().startForegroundService(ctc: context);
+    FlutterForegroundTask.initCommunicationPort(); // Re
   }
 
   @override
   Widget build(BuildContext context) {
-   
     CustomTheme theme = Theme.of(context).extension<CustomTheme>()!;
     return Scaffold(
       body: Container(
@@ -73,9 +91,9 @@ class _UsageDataScreenState extends State<UsageDataScreen> {
                           index == 0
                               ? 'Today'
                               : '${date.day.toString().padLeft(2, '0')}-${UsageDataScreen._month(date.month)}-${date.year}',
-                      'mobile': TextService().formatSpeed(mobile,false),
-                      'wifi': TextService().formatSpeed(wifi,false),
-                      'total': TextService().formatSpeed(total,false),
+                      'mobile': TextService().formatSpeed(mobile, false),
+                      'wifi': TextService().formatSpeed(wifi, false),
+                      'total': TextService().formatSpeed(total, false),
                     };
                   });
 

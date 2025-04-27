@@ -19,6 +19,13 @@ import android.os.Looper
 import io.flutter.embedding.engine.FlutterEngine
 
 
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import io.flutter.plugin.common.MethodCall
+
+
+
+
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.example.flutter_internet_meter/speed_icon"
     private var previousRxBytes: Long = 0
@@ -36,32 +43,18 @@ class MainActivity : FlutterActivity() {
                 updateNotificationIcon(speed)
                 result.success(null)
             } 
-            if (call.method == "getTotalBandwidthKbps") {
-                val currentTime = System.currentTimeMillis()
-                val rxBytes = TrafficStats.getTotalRxBytes()
-                val txBytes = TrafficStats.getTotalTxBytes()
-
-                if (previousTime == 0L) {
-                    previousTime = currentTime
-                    previousRxBytes = rxBytes
-                    previousTxBytes = txBytes
-                    result.success(0.0)
-                    return@setMethodCallHandler
-                }
-
-                val timeDiff = (currentTime - previousTime) / 1000.0 // seconds
-                val dataDiff = (rxBytes - previousRxBytes) + (txBytes - previousTxBytes) // bytes
-
-                val kbps = if (timeDiff > 0) (dataDiff * 8.0 / 1024.0) / timeDiff else 0.0
-
-                // Update previous values
-                previousRxBytes = rxBytes
-                previousTxBytes = txBytes
-                previousTime = currentTime
-
-                result.success(kbps) // in Kbps
+            if (call.method == "isInternetConnected") {
+                val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetwork = connectivityManager.activeNetwork
+            val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+            val isConnected = networkCapabilities != null && (
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+            )
+                
+                result.success(isConnected)
             } 
-            
+           
             
             else {
                 result.notImplemented()
@@ -175,5 +168,6 @@ private fun createBitmapWithSpeedText(speed: String, verticalOffset: Float): Bit
 
     return bitmap
 }
+
 
 }

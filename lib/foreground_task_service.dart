@@ -1,10 +1,14 @@
 import 'dart:async';
 
-import 'package:flutter/rendering.dart';
+import 'package:flutter/material.dart';
+
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_internet_meter/data_usage.dart';
 import 'package:flutter_internet_meter/storage_service.dart';
 import 'package:flutter_internet_meter/text_service.dart';
+import 'package:flutter_internet_meter/theme/state/app_setting_cubit.dart';
 import 'package:flutter_internet_meter/theme/state/app_setting_state.dart';
 
 class SpeedMonitorService {
@@ -16,7 +20,42 @@ class SpeedMonitorService {
 
   SpeedMonitorService._internal();
 
-  Future<void> startForegroundService() async {
+  late Timer timer;
+
+  bool foregroundTaskRunningAlready = false;
+
+  static const _channel = MethodChannel(
+    "com.example.flutter_internet_meter/speed_icon",
+  );
+
+  //
+  Future<void> startForegroundService({required BuildContext ctc}) async {
+    bool isConnected = false;
+
+    timer = Timer.periodic(Duration(seconds: 1), (_) async {
+      try {
+        isConnected = await _channel.invokeMethod('isInternetConnected');
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+
+      NotificationPreference notificationPreference =
+          ctc.read<AppSettingCubit>().state.notificationPreference;
+      if (notificationPreference ==
+              NotificationPreference.onlyWhenInternetIsConnected &&
+          isConnected == false) {
+        foregroundTaskRunningAlready = false;
+        FlutterForegroundTask.stopService();
+      } else {
+        if (!foregroundTaskRunningAlready) {
+          init();
+        }
+      }
+    });
+  }
+
+  Future<void> init() async {
+    foregroundTaskRunningAlready = true;
     _initializeForegroundTask();
 
     // Start the foreground service with notification and callback
@@ -39,25 +78,25 @@ class SpeedMonitorService {
       DataUsageStorageService.instance.writeToMainBox(usageList);
     });
   }
-}
 
-// Initialize the foreground task
-void _initializeForegroundTask() {
-  FlutterForegroundTask.init(
-    androidNotificationOptions: AndroidNotificationOptions(
-      channelId: 'speed_monitor_channel',
-      channelName: 'Speed Monitor Service',
-      channelDescription: 'Shows internet speed even when app is closed',
-      channelImportance: NotificationChannelImportance.HIGH,
-      priority: NotificationPriority.LOW,
-    ),
-    iosNotificationOptions: const IOSNotificationOptions(),
-    foregroundTaskOptions: ForegroundTaskOptions(
-      eventAction: ForegroundTaskEventAction.repeat(1000),
-      autoRunOnBoot: true,
-      allowWakeLock: true,
-    ),
-  );
+  // Initialize the foreground task
+  void _initializeForegroundTask() {
+    FlutterForegroundTask.init(
+      androidNotificationOptions: AndroidNotificationOptions(
+        channelId: 'speed_monitor_channel',
+        channelName: 'Speed Monitor Service',
+        channelDescription: 'Shows internet speed even when app is closed',
+        channelImportance: NotificationChannelImportance.HIGH,
+        priority: NotificationPriority.LOW,
+      ),
+      iosNotificationOptions: const IOSNotificationOptions(),
+      foregroundTaskOptions: ForegroundTaskOptions(
+        eventAction: ForegroundTaskEventAction.repeat(1000),
+        autoRunOnBoot: true,
+        allowWakeLock: true,
+      ),
+    );
+  }
 }
 
 // Entry point for the callback function in the foreground task
