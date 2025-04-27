@@ -11,7 +11,6 @@ class ThemeCubit extends Cubit<ThemeState> {
 
   Future<void> _loadTheme() async {
       final int? themeIndex = await _getTheme();
-      print("themeIndex: ${themeIndex}");
     final loadedThemeMode =
         themeIndex != null ? ThemeMode.values[themeIndex] : ThemeMode.system;
     emit(ThemeState(themeMode: loadedThemeMode));
