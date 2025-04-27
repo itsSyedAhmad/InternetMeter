@@ -55,7 +55,7 @@ void _initializeForegroundTask() {
       channelName: 'Speed Monitor Service',
       channelDescription: 'Shows internet speed even when app is closed',
       channelImportance: NotificationChannelImportance.HIGH,
-      priority: NotificationPriority.HIGH,
+      priority: NotificationPriority.LOW,
     ),
     iosNotificationOptions: const IOSNotificationOptions(),
     foregroundTaskOptions: ForegroundTaskOptions(
