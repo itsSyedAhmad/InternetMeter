@@ -49,7 +49,7 @@ class UsageDataScreen extends StatelessWidget {
             _buildHeader(theme),
             Expanded(
               child: ValueListenableBuilder(
-                valueListenable: StorageService.instance.listenableBox,
+                valueListenable: DataUsageStorageService.instance.listenableBox,
                 builder: (context, Box<DataUsageModel> box, _) {
                   final List<Map<String, String>> usage = List.generate(30, (
                     index,

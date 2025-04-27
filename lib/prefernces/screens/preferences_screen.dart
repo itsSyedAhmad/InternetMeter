@@ -14,15 +14,17 @@ class PreferencesScreen extends StatelessWidget {
       backgroundColor: theme.primaryContainerColor,
       appBar: AppBar(
         backgroundColor: theme.secondaryColor,
-        title: Text(prefernces, style: theme.heading1!.copyWith(color: Colors.white))),
+        title: Text(
+          prefernces,
+          style: theme.heading1!.copyWith(color: Colors.white),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 10),
             ListTile(
-              onTap: (){
-
-              },
+              onTap: () {},
               title: Text(notificationPreferenceTitle, style: theme.title1),
               subtitle: Text(
                 notificationPreferenceSubtitle,
@@ -31,31 +33,27 @@ class PreferencesScreen extends StatelessWidget {
             ),
             Divider(),
             ListTile(
-                onTap: (){
+              onTap: () async {
                 
               },
-              title: Text(showUpDownTitle,  style: theme.title1),
+              title: Text(showUpDownTitle, style: theme.title1),
               subtitle: Text(showUpDownSubtitle, style: theme.subtitle1),
             ),
             Divider(),
             ListTile(
-                onTap: (){
-                
-              },
+              onTap: () {},
               title: Text(speedUnitsTitle, style: theme.title1),
               subtitle: Text(speedUnitsinBytes, style: theme.subtitle1),
             ),
             Divider(),
             ListTile(
-                onTap: (){
-                
-              },
+              onTap: () {},
               title: Text(dataUsageTitle, style: theme.title1),
               subtitle: Text(dataUsageSubtitle, style: theme.subtitle1),
             ),
             Divider(),
             ListTile(
-                onTap: (){
+              onTap: () {
                 showThemeDialog(context, theme);
               },
               title: Text(themeTitle, style: theme.title1),
@@ -63,8 +61,8 @@ class PreferencesScreen extends StatelessWidget {
             ),
             Divider(),
             ListTile(
-                onTap: (){
-                viewAboutDialog(context, aboutTitle,aboutDescription, theme);
+              onTap: () {
+                viewAboutDialog(context, aboutTitle, aboutDescription, theme);
               },
               title: Text(aboutTitle, style: theme.title1),
               subtitle: Text(aboutSubtitle, style: theme.subtitle1),

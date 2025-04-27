@@ -19,3 +19,7 @@ const dataUsageSubtitle = "This will show the monthly mobile data usage in notif
 const themeSubtitle = "Set the custom color theme";
 const aboutSubtitle = "About this App";
 const aboutDescription = "This app provides comprehensive internet speed testing and data usage monitoring capabilities.\nIt allows you to accurately measure your network performance and track your data consumption.\nKey features include real-time speed tests, detailed data usage statistics, and user-friendly reporting.";
+
+//db constants
+const isShowUpDownSpeedKey = "IS_SHOW_UP_DOWN_SPEED";
+const themeKey = "THEME_KEY";

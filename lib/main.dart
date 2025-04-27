@@ -22,7 +22,7 @@ void main() async {
   }
 
   // //init services
-  await StorageService.instance.init();
+  await DataUsageStorageService.instance.init();
   await SpeedMonitorService().startForegroundService();
 
   runApp(
