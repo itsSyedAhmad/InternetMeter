@@ -28,8 +28,8 @@ void main() async {
 
   runApp(
     MultiBlocProvider(
-      providers: [BlocProvider(create: (context) => ThemeCubit())],
-      child: BlocBuilder<ThemeCubit, ThemeState>(
+      providers: [BlocProvider(create: (context) => AppSettingCubit())],
+      child: BlocBuilder<AppSettingCubit, AppSetttingState>(
         builder: (context, themeState) {
           return MaterialApp(
             home: UsageDataScreen(),
