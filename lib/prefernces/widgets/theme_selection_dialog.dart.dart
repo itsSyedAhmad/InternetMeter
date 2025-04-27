@@ -5,7 +5,7 @@ import 'package:flutter_internet_meter/theme/theme.dart';
 
 Future<void> showThemeDialog(BuildContext context, CustomTheme theme) async {
   String? selectedValue = getThemeStringMode(
-    context.read<ThemeCubit>().state.themeMode,
+    context.read<AppSettingCubit>().state.themeMode,
   );
 
   await showDialog<String>(
@@ -67,7 +67,7 @@ Future<void> showThemeDialog(BuildContext context, CustomTheme theme) async {
                 debugPrint('Selected Theme: $selectedValue');
                 // Perform actions based on the selected theme
                 ThemeMode selectedTheme = getThemeModeFromString(selectedValue);
-                context.read<ThemeCubit>().setTheme(selectedTheme);
+                context.read<AppSettingCubit>().setTheme(selectedTheme);
                 Navigator.of(context).pop();
               } else {
                 // Optionally show a message if no option is selected

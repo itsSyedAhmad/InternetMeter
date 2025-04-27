@@ -23,3 +23,7 @@ const aboutDescription = "This app provides comprehensive internet speed testing
 //db constants
 const isShowUpDownSpeedKey = "IS_SHOW_UP_DOWN_SPEED";
 const themeKey = "THEME_KEY";
+const String notificationPreferenceKey = "NOTIFICATION_PREFERENCE_KEY";
+const String speedIndicatorTypeKey = "SPEED_INDICATOR_TYPE_KEY";
+const String speedUnitKey = "SPEED_UNIT_KEY";
+
