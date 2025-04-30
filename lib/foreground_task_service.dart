@@ -86,8 +86,9 @@ class SpeedMonitorService {
         channelId: 'speed_monitor_channel',
         channelName: 'Speed Monitor Service',
         channelDescription: 'Shows internet speed even when app is closed',
-        channelImportance: NotificationChannelImportance.HIGH,
-        priority: NotificationPriority.LOW,
+        channelImportance: NotificationChannelImportance.LOW,
+        priority: NotificationPriority.MIN,
+        visibility: NotificationVisibility.VISIBILITY_PRIVATE
       ),
       iosNotificationOptions: const IOSNotificationOptions(),
       foregroundTaskOptions: ForegroundTaskOptions(
@@ -144,8 +145,6 @@ class NetworkSpeedTaskHandler extends TaskHandler {
       );
     } else if (data["speedUnit"] != null) {
       speedUnit = SpeedUnitExtension.fromString(data["speedUnit"] as String);
-    } else if (data["resetStats"] != null) {
-      DataUsageStorageService.instance.resetIsolateBox();
     }
   }
 
@@ -164,7 +163,6 @@ class NetworkSpeedTaskHandler extends TaskHandler {
         uploadSpeedInKbps = resultMap["txKBps"] as double;
         isWiFi = resultMap["isWiFi"] as bool;
       }
-
       i++;
 
       final todayUsageBlock =

@@ -77,6 +77,7 @@ class PreferencesScreen extends StatelessWidget {
                     value:
                         settingState
                             .speedUnit, // you need to pass the current selected value here
+                            dropdownColor: theme.primaryContainerColor,
                     onChanged: (SpeedUnit? newValue) {
                       if (newValue != null) {
                         context.read<AppSettingCubit>().setSpeedUnit(newValue);
@@ -92,6 +93,7 @@ class PreferencesScreen extends StatelessWidget {
                             ),
                           );
                         }).toList(),
+                      
                   ),
                 ),
                 Divider(),
