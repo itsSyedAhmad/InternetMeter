@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_internet_meter/constants/constants.dart';
 import 'package:flutter_internet_meter/theme/theme.dart';
 
@@ -110,6 +111,15 @@ class PreferencesScreen extends StatelessWidget {
                 Divider(),
                 ListTile(
                   onTap: () {
+                    _showResetConfirmation(context);
+                  },
+                  //TODO: use Theme
+                  title: Text("Reset Stats", style: theme.title1),
+                  subtitle: Text("Clear Data", style: theme.subtitle1),
+                ),
+                Divider(),
+                ListTile(
+                  onTap: () {
                     viewAboutDialog(
                       context,
                       aboutTitle,
@@ -126,6 +136,57 @@ class PreferencesScreen extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+
+  //TODO: use Theme
+  void _showResetConfirmation(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Are you sure you want to reset the stats?',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                    ),
+                    onPressed: () {
+                      FlutterForegroundTask.sendDataToTask({
+                        "resetStats": true,
+                      });
+                      Navigator.pop(context); // Close the sheet
+                      // Add your reset logic here
+                      print("Stats reset");
+                    },
+                    child: Text('Yes'),
+                  ),
+                  OutlinedButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Just close the sheet
+                    },
+                    child: Text('No'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

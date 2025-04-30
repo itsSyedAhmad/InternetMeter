@@ -144,6 +144,8 @@ class NetworkSpeedTaskHandler extends TaskHandler {
       );
     } else if (data["speedUnit"] != null) {
       speedUnit = SpeedUnitExtension.fromString(data["speedUnit"] as String);
+    } else if (data["resetStats"] != null) {
+      DataUsageStorageService.instance.resetIsolateBox();
     }
   }
 
@@ -162,6 +164,7 @@ class NetworkSpeedTaskHandler extends TaskHandler {
         uploadSpeedInKbps = resultMap["txKBps"] as double;
         isWiFi = resultMap["isWiFi"] as bool;
       }
+
       i++;
 
       final todayUsageBlock =
